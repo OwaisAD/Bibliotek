@@ -1,4 +1,7 @@
 # Biblioteks-web-applikation
+
+Web applikation lavet med Tomcat servlets, herunder JSP sider og sat op med MySQL server
+
 ## Demo-app på 2. semester forår 2022
 
 Der er med vilje ikke refaktoreret i bund, og der er ikke lavet design, men applikationen indeholder:
