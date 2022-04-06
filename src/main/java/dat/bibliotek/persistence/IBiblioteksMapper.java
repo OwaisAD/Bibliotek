@@ -30,6 +30,9 @@ public interface IBiblioteksMapper
     // Indsæt en nyt låner (insert)
     public Laaner opretNyLaaner(Laaner laaner) throws DatabaseException;
 
+    //Opret ny bog (insert)
+    public Bog opretNyBog(Bog bog) throws DatabaseException;
+
     // Opret et nyt udlån af en bog (insert)
     public boolean opretNytUdlaan(Udlaan udlaan) throws DatabaseException;
 
@@ -41,4 +44,6 @@ public interface IBiblioteksMapper
 
     // Rediger en bogtitel (update)
     public boolean opdaterBog(Bog bog) throws DatabaseException;
+
+
 }

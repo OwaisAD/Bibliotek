@@ -1,23 +1,22 @@
 package dat.bibliotek.web;
 
 import dat.bibliotek.config.ApplicationStart;
-import dat.bibliotek.entities.Bog;
+import dat.bibliotek.dtos.BogListeDTO;
 import dat.bibliotek.exceptions.DatabaseException;
 import dat.bibliotek.persistence.BiblioteksMapper;
-import dat.bibliotek.persistence.ConnectionPool;
-
+import java.io.*;
+import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.http.*;
+import javax.servlet.annotation.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "redigerbog", urlPatterns = {"/redigerbog"} )
-public class redigerbog extends HttpServlet {
+import dat.bibliotek.persistence.ConnectionPool;
 
+@WebServlet(name = "bogliste", urlPatterns = {"/bogliste"} )
+public class BogListe extends HttpServlet
+{
     private ConnectionPool connectionPool;
 
     @Override
@@ -26,21 +25,35 @@ public class redigerbog extends HttpServlet {
         this.connectionPool = ApplicationStart.getConnectionPool();
     }
 
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
 
-        String idString = request.getParameter("rediger");
-        int bogId = Integer.parseInt(idString);
-        Bog bog = null;
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    {
+        response.setContentType("text/html");
         BiblioteksMapper biblioteksMapper = new BiblioteksMapper(connectionPool);
-        try {
-            bog = biblioteksMapper.hentBogUdFraId(bogId);
-        } catch (DatabaseException e) {
+        List<BogListeDTO> bogListeDTOList = null;
+        try
+        {
+            bogListeDTOList = biblioteksMapper.hentAlleBoegerOgDeresForfattere();
+        }
+        catch (DatabaseException e)
+        {
             Logger.getLogger("web").log(Level.SEVERE, e.getMessage());
             request.setAttribute("fejlbesked", e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        request.setAttribute("bog", bog);
-        request.getRequestDispatcher("WEB-INF/redigerbog.jsp").forward(request, response);
+        request.setAttribute("bogliste", bogListeDTOList);
+        request.getRequestDispatcher("WEB-INF/bogliste.jsp").forward(request, response);
+    }
+
+
+
+    public void destroy()
+    {
+
     }
 }

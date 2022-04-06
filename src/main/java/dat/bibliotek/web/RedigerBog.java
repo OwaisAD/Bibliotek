@@ -1,6 +1,7 @@
 package dat.bibliotek.web;
 
 import dat.bibliotek.config.ApplicationStart;
+import dat.bibliotek.entities.Bog;
 import dat.bibliotek.exceptions.DatabaseException;
 import dat.bibliotek.persistence.BiblioteksMapper;
 import dat.bibliotek.persistence.ConnectionPool;
@@ -14,8 +15,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "fjernbog", urlPatterns = {"/fjernbog"} )
-public class fjernbog extends HttpServlet {
+@WebServlet(name = "redigerbog", urlPatterns = {"/redigerbog"} )
+public class RedigerBog extends HttpServlet {
 
     private ConnectionPool connectionPool;
 
@@ -28,17 +29,18 @@ public class fjernbog extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String idString = request.getParameter("fjern");
+        String idString = request.getParameter("rediger");
         int bogId = Integer.parseInt(idString);
+        Bog bog = null;
         BiblioteksMapper biblioteksMapper = new BiblioteksMapper(connectionPool);
         try {
-            biblioteksMapper.fjernBog(bogId);
+            bog = biblioteksMapper.hentBogUdFraId(bogId);
         } catch (DatabaseException e) {
             Logger.getLogger("web").log(Level.SEVERE, e.getMessage());
             request.setAttribute("fejlbesked", e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-
-        request.getRequestDispatcher("bogliste").forward(request, response);
+        request.setAttribute("bog", bog);
+        request.getRequestDispatcher("WEB-INF/redigerbog.jsp").forward(request, response);
     }
 }

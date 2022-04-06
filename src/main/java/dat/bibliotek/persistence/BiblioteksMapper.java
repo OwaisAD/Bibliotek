@@ -238,6 +238,45 @@ public class BiblioteksMapper implements IBiblioteksMapper
     }
 
     @Override
+    public Bog opretNyBog(Bog bog) throws DatabaseException {
+        Logger.getLogger("web").log(Level.INFO, "");
+        boolean result = false;
+        int newId = 0;
+        String sql = "insert into bog (titel, udgivelsesaar, forfatter_id) values (?,?,?)";
+        try (Connection connection = connectionPool.getConnection())
+        {
+            try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS))
+            {
+                ps.setString(1, bog.getTitel());
+                ps.setInt(2, bog.getUdgivelsesaar());
+                ps.setInt(3, bog.getForfatter_id());
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 1)
+                {
+                    result = true;
+                } else
+                {
+                    throw new DatabaseException("Bog med titel = " + bog.getTitel() + " kunne ikke oprettes i databasen");
+                }
+                ResultSet idResultset = ps.getGeneratedKeys();
+                if (idResultset.next())
+                {
+                    newId = idResultset.getInt(1);
+                    bog.setBog_id(newId);
+                } else
+                {
+                    bog = null;
+                }
+            }
+        }
+        catch (SQLException ex)
+        {
+            throw new DatabaseException(ex, "Kunne ikke indsætte bog i databasen");
+        }
+        return bog;
+    }
+
+    @Override
     public boolean opretNytUdlaan(Udlaan udlaan) throws DatabaseException
     {
         Logger.getLogger("web").log(Level.INFO, "");

@@ -43,10 +43,10 @@
             </c:forEach>
             </tbody>
         </table>
-
+            <button name="opret" formaction="opretbogform">Opret ny bog</button>
         </form>
 
-        <button name="opretbog">Opret ny bog</button>
+
 
     </jsp:body>
 </t:pagetemplate>

@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "opdaterbog", urlPatterns = {"/opdaterbog"} )
-public class opdaterbog extends HttpServlet {
+@WebServlet(name = "opretbog", urlPatterns = {"/opretbog"} )
+public class OpretBog extends HttpServlet {
 
     private ConnectionPool connectionPool;
 
@@ -28,26 +28,26 @@ public class opdaterbog extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html");
 
-        int bogId = Integer.parseInt(request.getParameter("id"));
+        int bogId;
         String titel = request.getParameter("titel");
         int udgivelsesaar = Integer.parseInt(request.getParameter("aar"));
         int forfatter_id = Integer.parseInt(request.getParameter("forfatter_id"));
 
 
-        Bog bog = new Bog(bogId, titel, udgivelsesaar, forfatter_id);
+        Bog bog = new Bog(titel, udgivelsesaar, forfatter_id);
 
         BiblioteksMapper biblioteksMapper = new BiblioteksMapper(connectionPool);
         try {
-
-            boolean result = biblioteksMapper.opdaterBog(bog);
+            Bog nyBog = biblioteksMapper.opretNyBog(bog);
 
         } catch (DatabaseException e) {
             Logger.getLogger("web").log(Level.SEVERE, e.getMessage());
             request.setAttribute("fejlbesked", e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-
         request.getRequestDispatcher("bogliste").forward(request, response);
     }
 }

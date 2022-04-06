@@ -1,7 +1,6 @@
 package dat.bibliotek.web;
 
 import dat.bibliotek.config.ApplicationStart;
-import dat.bibliotek.dtos.UdlaanDTO;
 import dat.bibliotek.exceptions.DatabaseException;
 import dat.bibliotek.persistence.BiblioteksMapper;
 import dat.bibliotek.persistence.ConnectionPool;
@@ -12,13 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "udlaan", urlPatterns = {"/udlaan"} )
-public class udlaan extends HttpServlet
-{
+@WebServlet(name = "fjernbog", urlPatterns = {"/fjernbog"} )
+public class FjernBog extends HttpServlet {
+
     private ConnectionPool connectionPool;
 
     @Override
@@ -27,27 +25,20 @@ public class udlaan extends HttpServlet
         this.connectionPool = ApplicationStart.getConnectionPool();
     }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-    {
-        response.setContentType("text/html");
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String idString = request.getParameter("fjern");
+        int bogId = Integer.parseInt(idString);
         BiblioteksMapper biblioteksMapper = new BiblioteksMapper(connectionPool);
-        List<UdlaanDTO> udlaanDTOList = null;
-        try
-        {
-            udlaanDTOList = biblioteksMapper.hentAlleUdlaan();
-        }
-        catch (DatabaseException e)
-        {
+        try {
+            biblioteksMapper.fjernBog(bogId);
+        } catch (DatabaseException e) {
             Logger.getLogger("web").log(Level.SEVERE, e.getMessage());
             request.setAttribute("fejlbesked", e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        request.setAttribute("udlaanliste", udlaanDTOList);
-        request.getRequestDispatcher("WEB-INF/udlaan.jsp").forward(request, response);
-    }
 
-    public void destroy()
-    {
-
+        request.getRequestDispatcher("bogliste").forward(request, response);
     }
 }
